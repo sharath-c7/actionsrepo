@@ -7,12 +7,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: action/checkout@v3
-      - uses: Run a multi-line script
+      - name: Run a multi-line script
         run: |
           echo Add other actions to build,
           echo test, and deploy your project.
 
-    call-workflow-in-local-repo:
+  call-workflow-in-local-repo:
       #strategy:
       #  matrix:
       #     nodeversion: [14, 16, 18, 20]
