@@ -25,7 +25,7 @@ jobs:
             - name: Output for job 2
               run: echo "Hello from Job 2"
             - name: Make job 2 fail
-              run: exit 1
+              run: exit 0
     
     job-3:
         name: Job 3
