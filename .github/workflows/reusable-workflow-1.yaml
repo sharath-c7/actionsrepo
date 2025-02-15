@@ -1,0 +1,15 @@
+name: Reusable workflow 1
+on: 
+  workflow_call:
+    inputs:
+      node:
+        required: true
+        type: string
+jobs:
+    build:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v3
+        - name: Output the input values
+          run: | 
+            echo "The node versions to use is: ${{ inputs.node }}
