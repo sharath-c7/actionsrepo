@@ -3,22 +3,10 @@ name: Chaining Jobs
 on:
   workflow_dispatch:
     inputs:
-      name:
-        description: "Name of the person to greet"
+      run-job-3:
+        description: "Run job 3"
         required: true
-        default: "World"
-      city:
-        description: "City of the person to greet"
-        required: true
-        default: "Mumbai"
-        type: choice
-        options: ["Mumbai", "Delhi", "Bangalore", "Chennai"]
-      favorite_color:
-        description: "Favorite color of the person to greet"
-        required: true
-        type: choice
-        default: "Blue"
-        options: ["Red", "Green", "Blue", "Yellow"]
+        type: boolean
 
 jobs:
     job-1:
