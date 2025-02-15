@@ -25,14 +25,14 @@ jobs:
             run: dotnet build "${{ github.workspace }}/src/my-web-app.sln" --no-restore --configuration Release
 
           - name: Test
-            run: dotnet test "${{ github.workspace }}/src/my-web-app.sln" --no-restore --logger:"junit:LogfilePath=${{ github.workspace }}/test-results/test-results.xml;
+            run: dotnet test "${{ github.workspace }}/src/my-web-app.sln" --no-restore --logger:"junit;LogfilePath=${{ github.workspace }}/results/test-results.xml"
 
           - name: Create test summary
             uses: test-summary/action@v2.4
             with:
               paths: ${{ github.workspace }}/results/*.xml
               output: ${{ github.workspace }}/results/summary.md
-              show: all
+              show: "all"
             if: always()
 
           - name: Add test results to Job Summary
@@ -43,7 +43,7 @@ jobs:
             if: always()
 
           - name: Publish
-            run: dotnet publish "${{ github.workflow_dispatch}}/src/my-web-app/my-web-app.csproj" -c Release -o mywebapp
+            run: dotnet publish "${{github.workspace}}/src/my-web-app/my-web-app.csproj" -c Release -o mywebapp
 
           - name: Upload build artifact
             uses: actions/upload-artifact@v4
