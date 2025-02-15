@@ -41,3 +41,18 @@ jobs:
         needs: job2
         steps:
             - run: echo ${{ needs.job2.outputs.output1 }} ${{ needs.job2.outputs.output2 }}
+    
+    job4:
+        runs-on: ubuntu-latest
+        env:
+            VAR2: myjobvar2
+            VAR3: myjobvar3
+        steps:
+            - run: |
+                echo "VAR1=$VAR1"
+                echo ${{env.VAR1}}
+                echo ""
+                echo "VAR2=$VAR2"
+                echo "VAR3=$VAR3"
+              env:
+                    VAR3: mystepvar3
