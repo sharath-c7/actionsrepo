@@ -14,23 +14,26 @@ on:
         description: "City of the person to greet"
         required: true
         default: "Mumbai"
+        type: choice
         options: ["Mumbai", "Delhi", "Bangalore", "Chennai"]
       favorite_color:
         description: "Favorite color of the person to greet"
         required: true
+        type: choice
         default: "Blue"
         options: ["Red", "Green", "Blue", "Yellow"]
-  jobs:
-    # this workflow contains a single job called "greet"
-    greet:
-      #Display the name of the job
-      name: "Greetings, Program!"
-      runs-on:
-        - ubuntu-latest
-      steps:
-        # Run commands in the runner's shell and get context from the github object
-        - name: Send Greeting
-          run: |
-            echo "Hello ${{ github.event.inputs.name }}!"
-            echo "You are from ${{ github.event.inputs.city }}!"
-            echo "Your favorite color is ${{ github.event.inputs.favorite_color }}!"
+
+jobs:
+  # this workflow contains a single job called "greet"
+  greet:
+    #Display the name of the job
+    name: "Greetings, Program!"
+    runs-on:
+      - ubuntu-latest
+    steps:
+      # Run commands in the runner's shell and get context from the github object
+      - name: Send Greeting
+        run: |
+          echo "Hello ${{ github.event.inputs.name }}!"
+          echo "You are from ${{ github.event.inputs.city }}!"
+          echo "Your favorite color is ${{ github.event.inputs.favorite_color }}!"
