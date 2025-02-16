@@ -1,0 +1,27 @@
+name: PR - Build / Test - Composite action
+
+on:
+    pull_request:
+        branches:
+            - main
+    workflow_dispatch:
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        
+        steps:
+            - name: Before composite action
+              run: |
+               echo "Hello from composite action"
+
+            - name: Build and Publish .Net Core App
+              uses: sharath-c7/build-test-dotnet-app-custom-action@main
+              with:
+                  dotnet-version: '8.0.x'
+                  project-path: "${{ github.workspace }}/src/my-web-app/my-web-app.csproj"
+                  output-path: "mywebapp"
+
+            - name: After Composite Action
+              run: |
+                echo "Hello from after composite action"
