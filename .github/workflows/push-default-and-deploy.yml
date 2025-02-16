@@ -76,9 +76,9 @@ jobs:
             - name: Login to Azure
               uses: azure/login@v2.2.0
               with:
-                  subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-                  tenant_id: ${{ secrets.AZURE_TENANT_ID }}
-                  client_id: ${{ secrets.AZURE_CLIENT_ID }}
+                  subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+                  tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+                  client-id: ${{ secrets.AZURE_CLIENT_ID }}
 
             - name: Deploy to Azure Web App
               uses: azure/webapps-deploy@v3
@@ -109,9 +109,9 @@ jobs:
             - name: Login to Azure
               uses: azure/login@v2.2.0
               with:
-                  subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-                  tenant_id: ${{ secrets.AZURE_TENANT_ID }}
-                  client_id: ${{ secrets.AZURE_CLIENT_ID }}
+                  subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+                  tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+                  client-id: ${{ secrets.AZURE_CLIENT_ID }}
 
             - name: Deploy to Azure Web App
               uses: azure/webapps-deploy@v3
@@ -142,9 +142,9 @@ jobs:
           - name: Login to Azure
             uses: azure/login@v2.2.0
             with:
-                subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-                tenant_id: ${{ secrets.AZURE_TENANT_ID }}
-                client_id: ${{ secrets.AZURE_CLIENT_ID }}
+                subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+                tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+                client-id: ${{ secrets.AZURE_CLIENT_ID }}
           - name: Deploy to Azure Web App
             uses: azure/webapps-deploy@v3
             with:
