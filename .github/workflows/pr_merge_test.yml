@@ -31,6 +31,12 @@ jobs:
             region=${{ env.region }}
             instance=${{ env.instance }}
             mkdir -p deployments/customer/$region/$instance
+            cd deployments/customer/$region/$instance
+            cat <<EOF > env.txt
+            echo "first line"
+            echo "second line"
+            echo "third line"
+            EOF
             
       - name: Run some task or tests
         run: |
