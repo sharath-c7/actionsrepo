@@ -1,0 +1,37 @@
+name: "Database Migration"
+description: "Migrate a Postgres service spinned up for testing purposes."
+inputs:
+  database_url:
+    description: "Connection string for the database. Follows the format: postgres://[user[:password]@][host][:port][/dbname][?options]"
+    required: true
+    default: "postgres://root:password@localhost:5432/test?sslmode=disable"
+  migration_files_source:
+    description: "Path or URL to migration files. Can be local, a GitHub repo using 'github://<owner>/<repo>?dir=<directory>', or other formats supported by golang-migrate."
+    required: true
+    default: "file://db/migrations"
+outputs:
+  migration_report:
+    description: "Reports the status of the database migration"
+    value: $
+runs:
+  using: "composite"
+  steps:
+    - name: Install golang-migrate
+      run: |
+        curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.2/migrate.linux-amd64.tar.gz | tar xvz
+        sudo mv migrate /usr/bin/
+        which migrate
+      shell: bash
+
+    - name: Run database migrations
+      run: migrate -source $ \
+        -database $ -verbose up
+      shell: bash
+
+    - name: Report migration status
+      id: database-migration-report
+      run: if [ $? -eq 0 ]; then echo "report=Migrated database \
+        successfully" >> $GITHUB_OUTPUT; else echo "report=Failed to \
+        migrate database" >> $GITHUB_OUTPUT; fi
+      shell: bash
+      
