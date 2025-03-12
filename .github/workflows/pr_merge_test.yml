@@ -20,6 +20,8 @@ jobs:
       - name: Run some task or tests
         run: |
           echo "Running tests or tasks before creating a PR..."
+            git config user.email "sharath.c721@gmail.com"
+            git config user.name "sharath-c7"
 
       - name: Create a PR (if necessary)
         run: |
