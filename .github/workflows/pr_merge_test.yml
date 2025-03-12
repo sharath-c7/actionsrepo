@@ -12,8 +12,8 @@ on:
             type: string
 
 env:
-    region: ${{ github.event.inputs.region }}
-    instance: ${{ github.event.inputs.instance }}            
+    region: ${{ github.event.inputs.region || 'us' }}
+    instance: ${{ github.event.inputs.instance || 'dev' }}            
 jobs:
   create-pr:
     runs-on: ubuntu-latest
