@@ -26,14 +26,19 @@ jobs:
 
       - name: Create Realm Folders and YAML
         run: |
-          # Convert the input string to JSON array format
-          echo "{${{ inputs.realm_data }}}" | jq -c 'to_entries | map({"realmname": .key, "realmid": .value})' > temp_realm_data.json
+          # Create a temporary file with the input data
+          echo "{${{ inputs.realm_data }}}" > temp_realm_data.json
 
           # Process each realm entry
-          jq -c '.[]' temp_realm_data.json | while read -r item; do
-            # Extract realmname and realmid
-            realmname=$(echo "$item" | jq -r '.realmname')
-            realmid=$(echo "$item" | jq -r '.realmid')
+          while IFS=: read -r realmname realmid; do
+            # Remove quotes and trim whitespace
+            realmname=$(echo "$realmname" | tr -d '"' | xargs)
+            realmid=$(echo "$realmid" | tr -d '"' | xargs)
+
+            # Skip empty lines
+            if [ -z "$realmname" ] || [ -z "$realmid" ]; then
+              continue
+            fi
 
             # Create base directory structure with customer and environment
             mkdir -p "deployments/${{ inputs.customer }}/${{ inputs.environment }}/application/terraform/realms/$realmname"
@@ -51,7 +56,7 @@ jobs:
             environment: ${{ inputs.environment }}
             customer: ${{ inputs.customer }}
             EOF
-          done
+          done < <(echo "${{ inputs.realm_data }}" | tr ',' '\n')
 
       - name: Commit and Push Changes
         run: |
