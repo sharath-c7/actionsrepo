@@ -1,0 +1,73 @@
+name: Azure Storage Container Operations
+
+on:
+  workflow_dispatch: # Allows manual triggering of the workflow
+
+env:
+  STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
+  STORAGE_CONTAINER_NAME: ${{ secrets.AZURE_STORAGE_CONTAINER_NAME }}
+
+jobs:
+  azure-storage-ops:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Azure CLI Login
+        run: |
+          az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+
+      - name: Create Storage Container
+        run: |
+          # Get the storage account connection string
+          STORAGE_CONNECTION_STRING=$(az storage account show-connection-string \
+            --name ${{ env.STORAGE_ACCOUNT_NAME }} \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --query connectionString \
+            --output tsv)
+
+          # Create the container if it doesn't exist
+          az storage container create \
+            --name ${{ env.STORAGE_CONTAINER_NAME }} \
+            --connection-string "$STORAGE_CONNECTION_STRING" \
+            --public-access off
+
+      - name: Upload Sample File (Optional)
+        run: |
+          # Get the storage account connection string
+          STORAGE_CONNECTION_STRING=$(az storage account show-connection-string \
+            --name ${{ env.STORAGE_ACCOUNT_NAME }} \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --query connectionString \
+            --output tsv)
+
+          # Create a sample file and upload it
+          echo "This is a sample file" > sample.txt
+          az storage blob upload \
+            --account-name ${{ env.STORAGE_ACCOUNT_NAME }} \
+            --container-name ${{ env.STORAGE_CONTAINER_NAME }} \
+            --name sample.txt \
+            --file sample.txt \
+            --connection-string "$STORAGE_CONNECTION_STRING"
+
+      - name: List Container Contents
+        run: |
+          # Get the storage account connection string
+          STORAGE_CONNECTION_STRING=$(az storage account show-connection-string \
+            --name ${{ env.STORAGE_ACCOUNT_NAME }} \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --query connectionString \
+            --output tsv)
+
+          # List all blobs in the container
+          az storage blob list \
+            --container-name ${{ env.STORAGE_CONTAINER_NAME }} \
+            --connection-string "$STORAGE_CONNECTION_STRING" \
+            --output table

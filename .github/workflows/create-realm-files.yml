@@ -1,0 +1,62 @@
+name: Create Realm Files
+
+on:
+  workflow_dispatch:
+    inputs:
+      customer:
+        description: "Customer name (e.g., ps, ms, gs)"
+        required: true
+        type: string
+      environment:
+        description: "Environment name (e.g., dev, prod, qa)"
+        required: true
+        type: string
+      realm_data:
+        description: 'JSON array of realm data in format [{"realmname": "name1", "realmid": "id1"}, {"realmname": "name2", "realmid": "id2"}]'
+        required: true
+        type: string
+
+jobs:
+  create-realm-files:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create Realm Folders and YAML
+        run: |
+          # Create a temporary file to store the JSON data
+          echo '${{ inputs.realm_data }}' > temp_realm_data.json
+
+          # Process each realm entry
+          jq -c '.[]' temp_realm_data.json | while read -r item; do
+            # Extract realmname and realmid
+            realmname=$(echo "$item" | jq -r '.realmname')
+            realmid=$(echo "$item" | jq -r '.realmid')
+
+            # Create base directory structure with customer and environment
+            mkdir -p "deployments/${{ inputs.customer }}/${{ inputs.environment }}/application/terraform/realms/$realmname"
+
+            # Create the realm folder
+            mkdir -p "deployments/${{ inputs.customer }}/${{ inputs.environment }}/application/terraform/realms/$realmname/$realmid"
+            
+            # Create .gitkeep file to ensure empty directories are tracked
+            touch "deployments/${{ inputs.customer }}/${{ inputs.environment }}/application/terraform/realms/$realmname/$realmid/.gitkeep"
+
+            # Create YAML file with realm information
+            cat > "deployments/${{ inputs.customer }}/${{ inputs.environment }}/application/terraform/realms/$realmname/$realmname.yaml" << EOF
+            realm_name: $realmname
+            realm_id: $realmid
+            environment: ${{ inputs.environment }}
+            customer: ${{ inputs.customer }}
+            EOF
+          done
+
+      - name: Commit and Push Changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add deployments/${{ inputs.customer }}/${{ inputs.environment }}/application/terraform/realms/
+          git commit -m "Create realm folders and YAML files for realms in ${{ inputs.customer }}/${{ inputs.environment }}"
+          git push
