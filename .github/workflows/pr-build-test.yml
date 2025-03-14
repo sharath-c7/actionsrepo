@@ -39,6 +39,9 @@ jobs:
           paths: ${{ github.workspace }}/results/*.xml
           output: ${{ github.workspace }}/results/summary.md
           show: "all"
+
+
+          
         if: always()
 
       # I am adding the test results to the Job Summary
