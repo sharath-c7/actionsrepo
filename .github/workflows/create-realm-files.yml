@@ -12,7 +12,7 @@ on:
         required: true
         type: string
       realm_data:
-        description: 'JSON array of realm data in format [{"realmname": "name1", "realmid": "id1"}, {"realmname": "name2", "realmid": "id2"}]'
+        description: 'Realm data in format "realm1": "id1", "realm2": "id2"'
         required: true
         type: string
 
@@ -26,8 +26,8 @@ jobs:
 
       - name: Create Realm Folders and YAML
         run: |
-          # Create a temporary file to store the JSON data
-          echo '${{ inputs.realm_data }}' > temp_realm_data.json
+          # Convert the input string to JSON array format
+          echo "{${{ inputs.realm_data }}}" | jq -c 'to_entries | map({"realmname": .key, "realmid": .value})' > temp_realm_data.json
 
           # Process each realm entry
           jq -c '.[]' temp_realm_data.json | while read -r item; do
