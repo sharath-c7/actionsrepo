@@ -1,9 +1,7 @@
 name: Main Workflow
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   trigger-workflow:
@@ -13,3 +11,4 @@ jobs:
         uses: ./.github/workflows/called-workflow.yml
         with:
           param1: "Some value"
+          param2: "Another Value"
