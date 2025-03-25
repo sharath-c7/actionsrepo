@@ -1,0 +1,16 @@
+name: Called Workflow
+
+on:
+  workflow_call:
+    inputs:
+      param1:
+        required: true
+        type: string
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show the event name
+        run: |
+          echo "This workflow was triggered by the event: ${{ github.event_name }}"
