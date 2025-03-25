@@ -6,6 +6,10 @@ on:
       param1:
         required: true
         type: string
+      param2:
+        required: true
+        type: string
+
 
 jobs:
   run:
@@ -14,3 +18,9 @@ jobs:
       - name: Show the event name
         run: |
           echo "This workflow was triggered by the event: ${{ github.event_name }}"
+          
+          param1_lower=$(echo "${{ inputs.param1 }}" | tr '[:upper:]' '[:lower:]')
+          param2_lower=$(echo "${{ inputs.param2 }}" | tr '[:upper:]' '[:lower:]')
+
+          echo "Converted param1 to lowercase: $param1_lower"
+          echo "Converted param2 to lowercase: $param2_lower"
