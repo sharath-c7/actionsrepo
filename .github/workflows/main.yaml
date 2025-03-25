@@ -5,10 +5,7 @@ on:
 
 jobs:
   trigger-workflow:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Trigger another workflow
-        uses: ./.github/workflows/called-workflow.yml
-        with:
-          param1: "Some value"
-          param2: "Another Value"
+    uses: ./.github/workflows/called-workflow.yml
+    with:
+      param1: "Some value"
+      param2: "Another Value"
