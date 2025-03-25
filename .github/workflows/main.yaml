@@ -1,0 +1,15 @@
+name: Main Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  trigger-workflow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger another workflow
+        uses: ./.github/workflows/called-workflow.yml
+        with:
+          param1: "Some value"
