@@ -13,3 +13,4 @@ jobs:
         - name: Output the input values
           run: | 
             echo "The node versions to use is: ${{ inputs.node }}"
+            echo "GitHub event name: ${{ github.event_name }}"
