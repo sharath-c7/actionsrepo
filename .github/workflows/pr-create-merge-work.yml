@@ -1,0 +1,84 @@
+name: Create PR, Merge and Process
+
+on:
+  workflow_dispatch:
+    inputs:
+      file_content:
+        description: "Content to write to the file"
+        required: true
+        type: string
+      file_name:
+        description: "Name of the file to create"
+        required: true
+        type: string
+
+jobs:
+  create-and-merge-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create new branch
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          git checkout -b feature/add-file-${{ github.run_number }}
+
+      - name: Create file
+        run: |
+          echo "${{ inputs.file_content }}" > ${{ inputs.file_name }}
+
+      - name: Commit changes
+        run: |
+          git add ${{ inputs.file_name }}
+          git commit -m "Add new file: ${{ inputs.file_name }}"
+
+      - name: Push changes
+        run: |
+          git push origin feature/add-file-${{ github.run_number }}
+
+      - name: Create Pull Request
+        id: create-pr
+        uses: peter-evans/create-pull-request@v5
+        with:
+          commit-message: "Add new file: ${{ inputs.file_name }}"
+          title: "Add new file: ${{ inputs.file_name }}"
+          body: "This PR adds a new file: ${{ inputs.file_name }}"
+          branch: feature/add-file-${{ github.run_number }}
+
+      - name: Merge Pull Request
+        run: |
+          gh pr merge ${{ steps.create-pr.outputs.pull-request-url }} --merge --delete-branch=false
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Wait for merge to complete
+        run: |
+          sleep 5  # Give GitHub time to process the merge
+          gh pr view ${{ steps.create-pr.outputs.pull-request-url }} --json state
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  process-merged-file:
+    needs: create-and-merge-pr
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Pull latest changes
+        run: |
+          git pull origin main
+
+      - name: Process file
+        run: |
+          echo "Processing file: ${{ inputs.file_name }}"
+          echo "File contents:"
+          cat ${{ inputs.file_name }}
+          # Add your processing logic here
