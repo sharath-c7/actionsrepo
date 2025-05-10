@@ -1,0 +1,72 @@
+name: PR Workflow with Two Jobs
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+        region:
+            type: string
+        instance:
+            type: string
+
+env:
+    region: ${{ github.event.inputs.region || 'us' }}
+    instance: ${{ github.event.inputs.instance || 'dev' }}            
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js (or any other necessary environment)
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'  # Specify your node version or other environment setup
+
+      - name: Create deployment structure
+        run: |
+            region=${{ env.region }}
+            instance=${{ env.instance }}
+            mkdir -p deployments/customer/$region/$instance
+            cd deployments/customer/$region/$instance
+            cat <<EOF > env.txt
+            echo "first line"
+            echo "second line"
+            echo "third line"
+            EOF
+            
+      - name: Run some task or tests
+        run: |
+          echo "Running tests or tasks before creating a PR..."
+            git config user.email "sharath.c721@gmail.com"
+            git config user.name "sharath-c7"
+
+      - name: Create a PR (if necessary)
+        run: |
+          git checkout -b feature-branch
+          # Add and commit changes here
+          git commit -am "New changes"
+          git push origin feature-branch
+          
+      # This step would actually trigger the PR creation.
+      # You can automate a PR via API or manually create it if required.
+
+  wait-for-pr-merge:
+    runs-on: ubuntu-latest
+    needs: create-pr
+    if: github.event.pull_request.merged == true
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      - name: Wait for PR to be merged
+        run: |
+          echo "Waiting for the PR to be merged..."
+      
+      - name: Run task after PR merge
+        run: |
+          echo "Running post-merge tasks now that the PR is merged!"
+          # Add your post-merge task here
