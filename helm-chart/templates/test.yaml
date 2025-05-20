@@ -1,1 +1,6 @@
-test: { { .Values.description } }
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-config
+data:
+  test: { { .Values.description | quote } }

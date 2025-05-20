@@ -39,7 +39,7 @@ jobs:
           echo "Templates directory contents:"
           ls -la helm-chart/templates/
           echo "Template file contents:"
-          cat helm-chart/templates/project.json
+          cat helm-chart/templates/project.yaml
 
       - name: Validate Helm chart
         run: |
@@ -67,15 +67,15 @@ jobs:
 
           # If lint passes, try to template
           echo "Running helm template..."
-          helm template helm-chart/ --debug > rendered-config.json || {
+          helm template helm-chart/ --debug > rendered-config.yaml || {
             echo "Helm template failed"
             exit 1
           }
 
-          # Validate JSON format
-          echo "Validating JSON output..."
-          cat rendered-config.json | jq '.' || {
-            echo "Invalid JSON output from helm template"
+          # Validate YAML format
+          echo "Validating YAML output..."
+          cat rendered-config.yaml | yq '.' || {
+            echo "Invalid YAML output from helm template"
             exit 1
           }
 
@@ -84,7 +84,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: rendered-config
-          path: rendered-config.json
+          path: rendered-config.yaml
           retention-days: 1
 
   apply-config:
@@ -110,5 +110,5 @@ jobs:
         run: |
           # Here you would add your specific commands to apply the configuration
           # For example, copying the file to a specific location or using it in your application
-          cp rendered-config.json project.json
+          cp rendered-config.yaml project.yaml
           echo "Configuration has been updated"
