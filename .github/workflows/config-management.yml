@@ -1,0 +1,64 @@
+name: Configuration Management
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "helm-chart/**"
+      - ".github/workflows/config-management.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "helm-chart/**"
+      - ".github/workflows/config-management.yml"
+
+jobs:
+  validate-config:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: "v3.12.0"
+
+      - name: Validate Helm chart
+        run: |
+          helm lint helm-chart/
+          helm template helm-chart/ > rendered-config.json
+          # Validate JSON format
+          cat rendered-config.json | jq '.'
+
+      - name: Store rendered config
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v3
+        with:
+          name: rendered-config
+          path: rendered-config.json
+
+  apply-config:
+    needs: validate-config
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: "v3.12.0"
+
+      - name: Download rendered config
+        uses: actions/download-artifact@v3
+        with:
+          name: rendered-config
+
+      - name: Apply configuration
+        run: |
+          # Here you would add your specific commands to apply the configuration
+          # For example, copying the file to a specific location or using it in your application
+          cp rendered-config.json project.json
+          echo "Configuration has been updated"

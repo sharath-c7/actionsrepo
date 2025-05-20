@@ -1,0 +1,24 @@
+{
+    "description": "A simple project to test the API",
+    "spec": {
+        "access-policies": [
+            {
+            "name": "exec-policy",
+            "roles": [
+                "owner"
+            ]
+        }],
+    "service-accounts": [
+        {
+            "name": "exec-sa",
+            "roles": [
+                "owner"
+            ]
+        }],
+        "tags": {
+            "cost-center": "123456",
+            "project-name": "test",
+            "project-owner": "John Doe"
+        }
+    }
+}

@@ -11,6 +11,8 @@ on:
         description: "Name of the file to create"
         required: true
         type: string
+  repository_dispatch:
+    types: [create_file]
 
 jobs:
   create-and-merge-pr:
@@ -29,12 +31,21 @@ jobs:
 
       - name: Create file
         run: |
-          echo "${{ inputs.file_content }}" > ${{ inputs.file_name }}
+          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+            echo "${{ github.event.client_payload.file_content }}" > ${{ github.event.client_payload.file_name }}
+          else
+            echo "${{ inputs.file_content }}" > ${{ inputs.file_name }}
+          fi
 
       - name: Commit changes
         run: |
-          git add ${{ inputs.file_name }}
-          git commit -m "Add new file: ${{ inputs.file_name }}"
+          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+            git add ${{ github.event.client_payload.file_name }}
+            git commit -m "Add new file: ${{ github.event.client_payload.file_name }}"
+          else
+            git add ${{ inputs.file_name }}
+            git commit -m "Add new file: ${{ inputs.file_name }}"
+          fi
 
       - name: Push changes
         run: |
@@ -44,9 +55,9 @@ jobs:
         id: create-pr
         uses: peter-evans/create-pull-request@v5
         with:
-          commit-message: "Add new file: ${{ inputs.file_name }}"
-          title: "Add new file: ${{ inputs.file_name }}"
-          body: "This PR adds a new file: ${{ inputs.file_name }}"
+          commit-message: "Add new file: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.file_name || inputs.file_name }}"
+          title: "Add new file: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.file_name || inputs.file_name }}"
+          body: "This PR adds a new file: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.file_name || inputs.file_name }}"
           branch: feature/add-file-${{ github.run_number }}
 
       - name: Merge Pull Request
@@ -78,7 +89,13 @@ jobs:
 
       - name: Process file
         run: |
-          echo "Processing file: ${{ inputs.file_name }}"
-          echo "File contents:"
-          cat ${{ inputs.file_name }}
+          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+            echo "Processing file: ${{ github.event.client_payload.file_name }}"
+            echo "File contents:"
+            cat ${{ github.event.client_payload.file_name }}
+          else
+            echo "Processing file: ${{ inputs.file_name }}"
+            echo "File contents:"
+            cat ${{ inputs.file_name }}
+          fi
           # Add your processing logic here

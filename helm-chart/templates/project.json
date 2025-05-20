@@ -1,0 +1,34 @@
+{
+    "description": {{ .Values.description | quote }},
+    "spec": {
+        "access-policies": [
+            {{- range $index, $policy := .Values.spec.accessPolicies }}
+            {
+                "name": {{ $policy.name | quote }},
+                "roles": [
+                    {{- range $index, $role := $policy.roles }}
+                    {{ $role | quote }}{{ if not (last $index $policy.roles) }},{{ end }}
+                    {{- end }}
+                ]
+            }{{ if not (last $index $.Values.spec.accessPolicies) }},{{ end }}
+            {{- end }}
+        ],
+        "service-accounts": [
+            {{- range $index, $sa := .Values.spec.serviceAccounts }}
+            {
+                "name": {{ $sa.name | quote }},
+                "roles": [
+                    {{- range $index, $role := $sa.roles }}
+                    {{ $role | quote }}{{ if not (last $index $sa.roles) }},{{ end }}
+                    {{- end }}
+                ]
+            }{{ if not (last $index $.Values.spec.serviceAccounts) }},{{ end }}
+            {{- end }}
+        ],
+        "tags": {
+            "cost-center": {{ .Values.spec.tags.costCenter | quote }},
+            "project-name": {{ .Values.spec.tags.projectName | quote }},
+            "project-owner": {{ .Values.spec.tags.projectOwner | quote }}
+        }
+    }
+} 
