@@ -7,10 +7,10 @@
                 "name": {{ $policy.name | quote }},
                 "roles": [
                     {{- range $index, $role := $policy.roles }}
-                    {{ $role | quote }}{{ if not (last $index $policy.roles) }},{{ end }}
+                    {{ $role | quote }}{{ if ne $index (sub (len $policy.roles) 1) }},{{ end }}
                     {{- end }}
                 ]
-            }{{ if not (last $index $.Values.spec.accessPolicies) }},{{ end }}
+            }{{ if ne $index (sub (len $.Values.spec.accessPolicies) 1) }},{{ end }}
             {{- end }}
         ],
         "service-accounts": [
@@ -19,10 +19,10 @@
                 "name": {{ $sa.name | quote }},
                 "roles": [
                     {{- range $index, $role := $sa.roles }}
-                    {{ $role | quote }}{{ if not (last $index $sa.roles) }},{{ end }}
+                    {{ $role | quote }}{{ if ne $index (sub (len $sa.roles) 1) }},{{ end }}
                     {{- end }}
                 ]
-            }{{ if not (last $index $.Values.spec.serviceAccounts) }},{{ end }}
+            }{{ if ne $index (sub (len $.Values.spec.serviceAccounts) 1) }},{{ end }}
             {{- end }}
         ],
         "tags": {
