@@ -38,10 +38,13 @@ jobs:
           cat helm-chart/values.yaml
           echo "Templates directory contents:"
           ls -la helm-chart/templates/
+          echo "Template file contents:"
+          cat helm-chart/templates/project.json
 
       - name: Validate Helm chart
         run: |
           # First try to lint the chart
+          echo "Running helm lint..."
           helm lint helm-chart/ || {
             echo "Helm lint failed. Checking for common issues..."
             # Check if Chart.yaml exists and is valid
@@ -63,12 +66,14 @@ jobs:
           }
 
           # If lint passes, try to template
-          helm template helm-chart/ > rendered-config.json || {
+          echo "Running helm template..."
+          helm template helm-chart/ --debug > rendered-config.json || {
             echo "Helm template failed"
             exit 1
           }
 
           # Validate JSON format
+          echo "Validating JSON output..."
           cat rendered-config.json | jq '.' || {
             echo "Invalid JSON output from helm template"
             exit 1
