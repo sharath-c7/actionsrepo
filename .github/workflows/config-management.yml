@@ -1,0 +1,114 @@
+name: Configuration Management
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "helm-chart/**"
+      - ".github/workflows/config-management.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "helm-chart/**"
+      - ".github/workflows/config-management.yml"
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  validate-config:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: "v3.12.0"
+
+      - name: Debug Helm chart structure
+        run: |
+          echo "Current directory structure:"
+          ls -la helm-chart/
+          echo "Chart.yaml contents:"
+          cat helm-chart/Chart.yaml
+          echo "Values.yaml contents:"
+          cat helm-chart/values.yaml
+          echo "Templates directory contents:"
+          ls -la helm-chart/templates/
+          echo "Template file contents:"
+          cat helm-chart/templates/project.yaml
+
+      - name: Validate Helm chart
+        run: |
+          # First try to lint the chart
+          echo "Running helm lint..."
+          helm lint helm-chart/ || {
+            echo "Helm lint failed. Checking for common issues..."
+            # Check if Chart.yaml exists and is valid
+            if [ ! -f helm-chart/Chart.yaml ]; then
+              echo "Error: Chart.yaml not found"
+              exit 1
+            fi
+            # Check if values.yaml exists
+            if [ ! -f helm-chart/values.yaml ]; then
+              echo "Error: values.yaml not found"
+              exit 1
+            fi
+            # Check if templates directory exists
+            if [ ! -d helm-chart/templates ]; then
+              echo "Error: templates directory not found"
+              exit 1
+            fi
+            exit 1
+          }
+
+          # If lint passes, try to template
+          echo "Running helm template..."
+          helm template helm-chart/ --debug > rendered-config.yaml || {
+            echo "Helm template failed"
+            exit 1
+          }
+
+          # Validate YAML format
+          echo "Validating YAML output..."
+          cat rendered-config.yaml | yq '.' || {
+            echo "Invalid YAML output from helm template"
+            exit 1
+          }
+
+      - name: Store rendered config
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: rendered-config
+          path: rendered-config.yaml
+          retention-days: 1
+
+  apply-config:
+    needs: validate-config
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: "v3.12.0"
+
+      - name: Download rendered config
+        uses: actions/download-artifact@v4
+        with:
+          name: rendered-config
+          path: .
+
+      - name: Apply configuration
+        run: |
+          # Here you would add your specific commands to apply the configuration
+          # For example, copying the file to a specific location or using it in your application
+          cp rendered-config.yaml project.yaml
+          echo "Configuration has been updated"

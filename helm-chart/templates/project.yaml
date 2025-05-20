@@ -1,0 +1,22 @@
+description: {{ .Values.description | quote }}
+spec:
+  access-policies:
+    {{- range $index, $policy := .Values.spec.accessPolicies }}
+    - name: {{ $policy.name | quote }}
+      roles:
+        {{- range $index, $role := $policy.roles }}
+        - {{ $role | quote }}
+        {{- end }}
+    {{- end }}
+  service-accounts:
+    {{- range $index, $sa := .Values.spec.serviceAccounts }}
+    - name: {{ $sa.name | quote }}
+      roles:
+        {{- range $index, $role := $sa.roles }}
+        - {{ $role | quote }}
+        {{- end }}
+    {{- end }}
+  tags:
+    cost-center: {{ .Values.spec.tags.costCenter | quote }}
+    project-name: {{ .Values.spec.tags.projectName | quote }}
+    project-owner: {{ .Values.spec.tags.projectOwner | quote }}
