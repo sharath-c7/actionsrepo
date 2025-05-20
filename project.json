@@ -1,15 +1,11 @@
 {
     "description": "A simple project to test the API",
     "spec": {
-        "access-policies": [
-            {
+        "access-policies": [{
             "name": "exec-policy",
-            "roles": [
-                "owner"
-            ]
+            "roles": ["owner"]
         }],
-    "service-accounts": [
-        {
+        "service-accounts": [{
             "name": "exec-sa",
             "roles": [
                 "owner"
