@@ -2,7 +2,7 @@
     "description": {{ .Values.description | quote }},
     "spec": {
         "access-policies": [
-            {{- range $index, $policy := .Values.spec.access-policies }}
+            {{- range $index, $policy := .Values.spec.accessPolicies }}
             {
                 "name": {{ $policy.name | quote }},
                 "roles": [
@@ -10,11 +10,11 @@
                     {{ $role | quote }}{{ if not (last $index $policy.roles) }},{{ end }}
                     {{- end }}
                 ]
-            }{{ if not (last $index $.Values.spec.access-policies) }},{{ end }}
+            }{{ if not (last $index $.Values.spec.accessPolicies) }},{{ end }}
             {{- end }}
         ],
         "service-accounts": [
-            {{- range $index, $sa := .Values.spec.service-accounts }}
+            {{- range $index, $sa := .Values.spec.serviceAccounts }}
             {
                 "name": {{ $sa.name | quote }},
                 "roles": [
@@ -22,13 +22,13 @@
                     {{ $role | quote }}{{ if not (last $index $sa.roles) }},{{ end }}
                     {{- end }}
                 ]
-            }{{ if not (last $index $.Values.spec.service-accounts) }},{{ end }}
+            }{{ if not (last $index $.Values.spec.serviceAccounts) }},{{ end }}
             {{- end }}
         ],
         "tags": {
-            "cost-center": {{ .Values.spec.tags.cost-center | quote }},
-            "project-name": {{ .Values.spec.tags.project-name | quote }},
-            "project-owner": {{ .Values.spec.tags.project-owner | quote }}
+            "cost-center": {{ .Values.spec.tags.costCenter | quote }},
+            "project-name": {{ .Values.spec.tags.projectName | quote }},
+            "project-owner": {{ .Values.spec.tags.projectOwner | quote }}
         }
     }
 } 

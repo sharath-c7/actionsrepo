@@ -1,17 +1,17 @@
 description: "A simple project to test the API"
 
 spec:
-  access-policies:
+  accessPolicies:
     - name: exec-policy
       roles:
         - owner
 
-  service-accounts:
+  serviceAccounts:
     - name: exec-sa
       roles:
         - owner
 
   tags:
-    cost-center: "123456"
-    project-name: "test"
-    project-owner: "John Doe"
+    costCenter: "123456"
+    projectName: "test"
+    projectOwner: "John Doe"
