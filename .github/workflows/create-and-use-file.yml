@@ -1,0 +1,64 @@
+name: Create and Use File
+
+on:
+  workflow_dispatch: # Manual trigger for demo/testing
+  push:
+    branches:
+      - "**" # Run on push to any branch
+
+jobs:
+  create-and-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create a file with date and time
+        run: |
+          FILE_NAME="myfile-$(date +%Y%m%d-%H%M%S).txt"
+          echo "file_name=$FILE_NAME" >> $GITHUB_ENV
+          echo "Hello from Job 1" > $FILE_NAME
+
+      - name: Set up git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Get current branch name
+        id: get_branch
+        run: echo "branch=$(echo $GITHUB_REF | sed 's/refs\/heads\///')" >> $GITHUB_OUTPUT
+
+      - name: Create new branch, commit, and push
+        run: |
+          NEW_BRANCH="add-myfile-branch-$(date +%s)"
+          echo "new_branch=$NEW_BRANCH" >> $GITHUB_ENV
+          git checkout -b $NEW_BRANCH
+          git add ${{ env.file_name }}
+          git commit -m "Add ${{ env.file_name }}"
+          git push origin $NEW_BRANCH
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: Add myfile.txt
+          branch: ${{ env.new_branch }}
+          title: "Add myfile.txt"
+          body: "This PR adds myfile.txt"
+          base: ${{ steps.get_branch.outputs.branch }}
+
+  use-file:
+    needs: create-and-pr
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Reference the file
+        run: |
+          if [ -f "${{ env.file_name }}" ]; then
+            echo "${{ env.file_name }} exists. Contents:" && cat "${{ env.file_name }}"
+          else
+            echo "${{ env.file_name }} does not exist."
+          fi
