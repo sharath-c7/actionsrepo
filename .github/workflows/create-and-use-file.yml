@@ -57,10 +57,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Find the latest generated file
+        id: find_file
+        run: |
+          FILE=$(ls -t myfile-*.txt | head -n 1)
+          echo "file_name=$FILE" >> $GITHUB_OUTPUT
+
       - name: Reference the file
         run: |
-          if [ -f "${{ env.file_name }}" ]; then
-            echo "${{ env.file_name }} exists. Contents:" && cat "${{ env.file_name }}"
+          if [ -f "${{ steps.find_file.outputs.file_name }}" ]; then
+            echo "${{ steps.find_file.outputs.file_name }} exists. Contents:" && cat "${{ steps.find_file.outputs.file_name }}"
           else
-            echo "${{ env.file_name }} does not exist."
+            echo "File does not exist."
           fi
