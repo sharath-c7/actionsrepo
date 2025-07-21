@@ -5,7 +5,9 @@ on:
   push:
     branches:
       - "**" # Run on push to any branch
-
+permissions:
+  contents: write
+  pull-requests: write
 jobs:
   create-and-pr:
     runs-on: ubuntu-latest
